@@ -1,0 +1,4 @@
+
+"VIN_FORMAT_ERROR" = "VIN is invalid or not formatted correctly.";
+"INVALID_URL" = "Internal Error: URL invalid.";
+"VIN_DECODE_DATA_INVALID" = "VIN data not in JSON format.";
