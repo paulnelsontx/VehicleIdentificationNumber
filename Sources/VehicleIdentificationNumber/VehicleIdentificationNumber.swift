@@ -106,7 +106,7 @@ public class VehicleIdentificationNumber : ObservableObject {
         }
     }
 
-    init( VIN: String = "", detailData : Data? = nil ) {
+    public init( VIN: String = "", detailData : Data? = nil ) {
         self.isValid = VehicleIdentificationNumber.checkVIN(VIN:VIN)
         self.VIN = VIN
         if let data = detailData {
