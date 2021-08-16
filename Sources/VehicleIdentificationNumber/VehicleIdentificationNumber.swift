@@ -117,17 +117,14 @@ public class VehicleIdentificationNumber : ObservableObject {
     @discardableResult public func decodeDetails(_ encoded: Data) -> [String:String]? {
         do {
             if let vdet = try JSONSerialization.jsonObject(with: encoded, options: [] ) as? [String:String] {
-                let sorted = vdet.sorted(by:<)
                 information.removeAll()
-                details.removeAll()
-                for item in sorted {
+                for item in vdet {
                     information[item.key] = item.value
-                    let detail = Detail(name: item.key, value: item.value)
-                    details.append( detail )
                 }
                 if VIN.count == 0, let detailVIN = information["VIN"] {
                     VIN = detailVIN
                 }
+                updateDetails()
                 return self.information
             }
         }
@@ -148,6 +145,17 @@ public class VehicleIdentificationNumber : ObservableObject {
                    )
             return nil
         }
+    }
+    
+    private func updateDetails() {
+        var detailItems = [Detail]()
+        for item in self.information {
+            detailItems.append( Detail(name: item.key, value: item.value) )
+        }
+        detailItems.sort { d1, d2 in
+            d1.name < d2.name
+        }
+        self.details.replaceSubrange(0..<self.details.count, with: detailItems)
     }
     
     private static func calculate_check_code(input:String) -> (Bool,String?) {
@@ -202,15 +210,14 @@ public class VehicleIdentificationNumber : ObservableObject {
                    let responseInfo = results.first {
                     DispatchQueue.main.async {
                         self.information.removeAll()
-                        self.details.removeAll()
                         for item in responseInfo {
                             if let vstring = item.value as? String, vstring.count > 0 {
                                 if vstring != "Not Applicable" {
                                     self.information[item.key] = vstring
-                                    self.details.append( Detail(name: item.key, value: vstring))
                                 }
                             }
                         }
+                        self.updateDetails()
                         completion( content, nil )
                     }
                     return
