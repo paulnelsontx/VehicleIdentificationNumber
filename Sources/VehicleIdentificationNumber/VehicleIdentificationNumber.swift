@@ -25,14 +25,14 @@ public class VehicleIdentificationNumber : ObservableObject {
         public let value: String
         public var id : String { return name }
     }
-    @Published var VIN : String {
+    @Published public var VIN : String {
         didSet {
             self.isValid = VehicleIdentificationNumber.checkVIN(VIN:VIN)
         }
     }
-    @Published var isValid : Bool
-    @Published var information = [String:String]()
-    @Published var details = [Detail]()
+    @Published public var isValid : Bool
+    @Published public var information = [String:String]()
+    @Published public var details = [Detail]()
     public var modelYear : Int {
         var year : Int
         guard VIN.count == 17 else {return 0}
