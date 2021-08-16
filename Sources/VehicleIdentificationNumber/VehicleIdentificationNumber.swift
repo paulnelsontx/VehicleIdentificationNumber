@@ -88,7 +88,7 @@ public class VehicleIdentificationNumber : ObservableObject {
         return URL(string:baseURL)
     }
 
-    public func fetch( checkValidity: Bool = true, _ completion: @escaping (Data?, Error?)->Void ) {
+    public func fetch( checkValidity: Bool = true, timeout: TimeInterval = 60, _ completion: @escaping (Data?, Error?)->Void ) {
         if checkValidity, !isValid {
             completion(nil, VINError(key: "VIN_FORMAT_ERROR"))
         }
@@ -96,9 +96,11 @@ public class VehicleIdentificationNumber : ObservableObject {
                "VehicleIdentificationNumber.fetch VIN \(VIN)" )
         if let url = self.decodeURL {
             let fetcher = Fetcher()
-            fetcher.fetch(url: url) { jsonData, error in
+            fetcher.fetch(url: url, timeout:timeout) { jsonData, error in
                 if let content = jsonData {
                     self.decodeFetchedData( content, completion )
+                } else {
+                    completion(nil, error)
                 }
             }
         } else {
@@ -270,8 +272,11 @@ public class VehicleIdentificationNumber : ObservableObject {
         private var session : URLSession? = nil
         private var vinTask : URLSessionDataTask? = nil
         
-        public func fetch(url: URL, _ completion: @escaping (Data?, Error?)->Void ) {
-            self.session = URLSession(configuration: .ephemeral, delegate:nil, delegateQueue: nil)
+        public func fetch(url: URL, timeout: TimeInterval = 60,  _ completion: @escaping (Data?, Error?)->Void ) {
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.timeoutIntervalForRequest = timeout
+            configuration.timeoutIntervalForResource = timeout
+            self.session = URLSession(configuration: configuration, delegate:nil, delegateQueue: nil)
             if let sess = self.session {
                 var request = URLRequest(url:url)
                 request.httpMethod = "GET"

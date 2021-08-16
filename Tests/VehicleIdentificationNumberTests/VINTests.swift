@@ -47,6 +47,28 @@ class VINTests: XCTestCase {
         }
     }
     
+    func testTimeoutOK() throws {
+        let expect = expectation(description: "fetch vin detail")
+        let vin = VehicleIdentificationNumber(VIN:"1C4HJXFG8KW606403")
+        XCTAssert( vin.isValid, "VIN Invalid?")
+        vin.fetch(checkValidity: false, timeout: 5) { data, error in
+            XCTAssertNotNil(data, "Fetch failed")
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10.0)
+        XCTAssert( vin.information["ErrorCode"]?.hasPrefix("0") ?? false )
+    }
+    func testTimeoutFail() throws {
+        let expect = expectation(description: "fetch vin detail")
+        let vin = VehicleIdentificationNumber(VIN:"1C4HJXFG8KW606403")
+        XCTAssert( vin.isValid, "VIN Invalid?")
+        vin.fetch(checkValidity: false, timeout: 0.01) { data, error in
+            XCTAssertNotNil(error, "Fetch should have returned an error")
+            expect.fulfill()
+        }
+        wait(for: [expect], timeout: 10.0)
+    }
+
     func testReplacingVIN() throws {
         // this vin has a correct check code, but the character at offset 7 is
         // not valid
