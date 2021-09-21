@@ -460,7 +460,7 @@
 			repositoryURL = "git@github.com:paulnelsontx/VehicleIdentificationNumber.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.0.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
