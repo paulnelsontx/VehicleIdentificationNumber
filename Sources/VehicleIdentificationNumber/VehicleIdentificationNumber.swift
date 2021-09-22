@@ -91,6 +91,7 @@ public class VehicleIdentificationNumber : ObservableObject {
     public func fetch( checkValidity: Bool = true, timeout: TimeInterval = 60, _ completion: @escaping (Data?, Error?)->Void ) {
         if checkValidity, !isValid {
             completion(nil, VINError(key: "VIN_FORMAT_ERROR"))
+            return
         }
         os_log("%@", log: .default, type: .debug,
                "VehicleIdentificationNumber.fetch VIN \(VIN)" )
@@ -281,6 +282,9 @@ public class VehicleIdentificationNumber : ObservableObject {
                 var request = URLRequest(url:url)
                 request.httpMethod = "GET"
                 vinTask = sess.dataTask(with: request){ recv, resp, error in
+                    if self.vinTask == nil {
+                        return
+                    }
                     if let err = error {
                         completion(nil, err)
                     } else if let response = resp as? HTTPURLResponse {
